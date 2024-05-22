@@ -11,8 +11,9 @@ const registerUser = asyncHandler(async (req, res) => {
     }) */
 
     // 1. Get user details from frontend
-    const { fullname, email, username, password } = req.body
-    console.log("email: ", email);
+    const { fullName, email, username, password } = req.body
+    // console.log("email: ", email);
+    // console.log(req.body, "body")
 
     // Validation. check whether anything is empty is not. 
     /* if (fullname === "") {
@@ -26,10 +27,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
+
     // email filtering  // string ka kaunsa method hai ki check ho ki usem @ hai ki nahi 
 
     // 3. Check if any user already 
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         // Operators 
         $or: [{ username }, { email }]
     })
@@ -39,10 +41,19 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // 4. Check for image, check for avatar
-    console.log(req.files); // checking
+    // console.log(req.files, "Checking files are present or not"); // checking
     const avatarLocalPath = req.files?.avatar[0]?.path;
     // cover image local path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+    // Checking if cover image is exits
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
+
+    // Learning Purpose 
+    // console.log(req.files, " req files")
 
     // checking avatar came from server
     if (!avatarLocalPath) {
@@ -61,7 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         fullName,
         avatar: avatar.url,
-        coverImage: converImage.url || "",// Above we have checed for avatar is present or not
+        coverImage: converImage?.url || "",// Above we have checed for avatar is present or not
         // but we have not check for coverImage though cover image is not compulsory but it will break the code 
         // so checking here that if exists then fine else add/get a empty string.
         email,
@@ -80,9 +91,10 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) {
         throw new ApiError(500, "Something went wrong while whlie registering the user")
     }
+    console.log(createdUser, "Hello JI created user here")
 
     // 9. Return response
-    return response.status(201).json(
+    return res.status(201).json(
         new ApiResponse(200, createdUser, "User registered scuccessfully")
     )
 

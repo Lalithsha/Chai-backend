@@ -5,7 +5,7 @@ import fs from "fs";
 // Configuration
 cloudinary.config({ // file upload permission configuration
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: 777152546872174,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
@@ -18,7 +18,11 @@ const uploadOnCloudinary = async (localFilePath) => {
             resource_type: "auto"
         })
         // File has been uploaded successfully
-        console.log("File is uploaded on cloudinary", response.url)
+        // console.log("File is uploaded on cloudinary", response.url) -> log's in console whether file is uploaded successfully
+
+        // unlink the file synchronously
+        fs.unlinkSync(localFilePath)
+        console.log(response, " This is the response from cloudinary")
         return response;
     }
     catch (error) {
